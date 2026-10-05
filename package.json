@@ -1,0 +1,23 @@
+{
+  "name": "qa-training-playwright",
+  "version": "1.0.0",
+  "description": "automated software testing with playwright",
+  "homepage": "https://github.com/hazel-stratpoint/qa-training-playwright#readme",
+  "bugs": {
+    "url": "https://github.com/hazel-stratpoint/qa-training-playwright/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hazel-stratpoint/qa-training-playwright.git"
+  },
+  "license": "ISC",
+  "author": "hazel",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

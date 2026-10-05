@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Playwright files
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment variables
+.env
+
+# macOS system files
+.DS_Store
