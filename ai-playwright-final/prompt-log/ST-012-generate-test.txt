@@ -1,0 +1,14 @@
+/generate-test --project ./ai-playwright-final --ids ST-012
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-012
+Test category: Negative Path
+Cucumber tag: @regression
+Title: Login with Empty Fields
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Login Form section.
+3. Leave the Email field empty.
+4. Leave the Password field empty.
+5. Click the Sign In button.
+Expected result: An error or validation message is displayed; the form does not submit successfully.

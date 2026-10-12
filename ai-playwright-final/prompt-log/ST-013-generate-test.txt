@@ -1,0 +1,13 @@
+/generate-test --project ./ai-playwright-final --ids ST-013
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-013
+Test category: Negative Path
+Cucumber tag: @regression
+Title: Submit Empty Registration Form
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Registration Form section.
+3. Leave all registration fields empty.
+4. Click the Create Account button.
+Expected result: Validation errors appear on required fields; the account is not created.

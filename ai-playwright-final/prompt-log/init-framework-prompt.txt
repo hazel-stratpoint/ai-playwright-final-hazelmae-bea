@@ -1,0 +1,1 @@
+/init-framework ./ai-playwright-final https://cdn.stratpoint.io/training-2026/playwright-training-site.html

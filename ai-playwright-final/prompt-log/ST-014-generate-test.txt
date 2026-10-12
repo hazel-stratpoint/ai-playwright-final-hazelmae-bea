@@ -1,0 +1,13 @@
+/generate-test --project ./ai-playwright-final --ids ST-014
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-014
+Test category: Negative Path
+Cucumber tag: @regression
+Title: Filter Returns No Results
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Data Table section.
+3. Type zzznomatch in the Filter rows input.
+4. Assert no data rows are visible.
+Expected result: No rows are shown and the table indicates no matching results.

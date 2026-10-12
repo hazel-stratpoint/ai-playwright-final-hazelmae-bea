@@ -1,0 +1,15 @@
+/generate-test --project ./ai-playwright-final --ids ST-003
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-003
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Increment and Reset Counter
+Steps:
+1. Navigate to the training site.
+2. Navigate to Buttons & Interactions section.
+3. Click the + button 5 times.
+4. Assert the counter displays 5.
+5. Click the Reset button.
+6. Assert the counter displays 0.
+Expected result: Counter increments to 5 then resets to 0.

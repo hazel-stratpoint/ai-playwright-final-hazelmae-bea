@@ -1,0 +1,14 @@
+/generate-test --project ./ai-playwright-final --ids ST-006
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-006
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Filter Table by Name
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Sortable Data Table section.
+3. Assert the table shows 8 rows with text Showing 8 of 8 users.
+4. Type Alice in the Filter rows input.
+5. Assert only 1 row is visible and it contains Alice Chen.
+Expected result: The table filters correctly and shows only the matching row.

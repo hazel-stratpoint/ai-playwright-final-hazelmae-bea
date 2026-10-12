@@ -1,0 +1,16 @@
+/generate-test --project ./ai-playwright-final --ids ST-007
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-007
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Dismiss and Restore Alert Banners
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Alert Banners section.
+3. Assert all four alert banners are visible.
+4. Click Dismiss All.
+5. Assert all four banners are hidden.
+6. Click Restore All.
+7. Assert all four banners are visible again.
+Expected result: Banners toggle between hidden and visible based on the button clicked.
