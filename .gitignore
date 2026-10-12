@@ -13,3 +13,10 @@ playwright/.cache/
 
 # macOS system files
 .DS_Store
+
+# Nested Playwright + Cucumber project
+/ai-playwright-final/dist/
+/ai-playwright-final/reports/
+/ai-playwright-final/allure-results/
+/ai-playwright-final/allure-report/
+/ai-playwright-final/logs/

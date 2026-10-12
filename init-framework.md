@@ -136,7 +136,7 @@ Create the following structure. Add only files needed for this BDD design; do no
 ```text
 <target>/
 ├── .env.example
-├── .gitignore
+├── .gitignore                  # target-local only when no existing repository ignore file applies
 ├── .gitlab-ci.yml             # optional; generate when CI is requested/appropriate
 ├── Dockerfile                 # optional; generate when containerization is requested
 ├── docker-compose.yml         # optional; generate with Docker support
@@ -293,6 +293,7 @@ These examples are the implementation baseline for the scaffold. Keep generated 
 ```
 
 Use a Node.js version supported by the selected Cucumber release. If a pinned package version is unavailable or incompatible, select compatible published versions and update the Docker image to match Playwright. Do not add `allure-playwright`: Cucumber, not Playwright Test, runs scenarios.
+Because the example uses `allure-commandline` 2, document Java as a prerequisite for generating/serving Allure reports.
 
 ### `tsconfig.json`
 
@@ -300,15 +301,14 @@ Use a Node.js version supported by the selected Cucumber release. If a pinned pa
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": { "main/*": ["main/*"] },
+    "paths": { "main/*": ["./main/*"] },
     "types": ["node"],
     "outDir": "dist"
   },
@@ -343,13 +343,15 @@ module.exports = {
   smoke: { ...common, tags: "@smoke and not @scaffold" },
   regression: { ...common, tags: "@regression and not @scaffold" },
   scaffold: { ...common, tags: "@scaffold" },
-  "dry-run": { ...common, dryRun: true, tags: "not @scaffold" }
+  "dry-run": { ...common, dryRun: true, tags: "@scaffold" }
 };
 ```
 
 If the installed Cucumber or Allure adapter version requires a different supported formatter option, adapt this configuration and verify the output paths with a test run; do not silently drop a reporter.
 
 ### `.env.example`, `.gitignore`, `Dockerfile`, and `docker-compose.yml`
+
+Use the existing Git repository's root `.gitignore` when the target is nested inside that repository, adding target-relative ignore rules there instead of creating a redundant nested `.gitignore`. Create `<target>/.gitignore` when the target is not covered by an existing repository ignore file.
 
 ```dotenv
 # .env.example
@@ -753,6 +755,7 @@ Keep the CI image synchronized with the Playwright package version. Supply `BASE
 1. Install the supported Node.js version and run `npm ci`.
 2. Run `npx playwright install --with-deps chromium`.
 3. Copy `.env.example` to `.env` and set `BASE_URL`.
+4. Install a Java runtime to generate/serve Allure reports with the bundled Allure 2 command-line tool.
 
 ## Run
 - `npm run test:scaffold` — verify framework wiring
