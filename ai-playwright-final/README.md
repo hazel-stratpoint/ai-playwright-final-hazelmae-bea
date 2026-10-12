@@ -15,9 +15,9 @@ Playwright browser automation with TypeScript, Cucumber/Gherkin, and the Page Ob
 The slash commands must be configured in your AI coding workspace; creating this project does not install or define them.
 
 1. Run `/init-framework <target-folder> [base-url]` once from the workspace where the command is configured. The framework can be scaffolded before application test cases are ready.
-2. When test cases are available, run `/generate <CSV-path> --project <project-folder> --ids <id,...>` from that workspace, or attach/paste the test cases and identify the target project and IDs.
-3. `/generate` adds or updates the corresponding Gherkin scenarios, step definitions, locators, and POM methods in this project. Review the changes; do not rerun `/init-framework` just to add cases.
-4. If prompt records are part of the project deliverables, manually save the exact commands/prompts you used under `prompt-log/`. Do not include AI responses or chat transcripts.
+2. When test cases are available, run `/generate-test <CSV-path> --project <project-folder> --ids <id,...>` from that workspace, or attach/paste the test cases and identify the target project and IDs.
+3. `/generate-test` adds or updates the corresponding Gherkin scenarios, step definitions, locators, and POM methods in this project. Review the changes; do not rerun `/init-framework` just to add cases.
+4. If prompt records are part of the project deliverables, save the exact commands/prompts used under `prompt-log/`. Do not include AI responses or chat transcripts.
 
 ## Run
 
@@ -29,7 +29,7 @@ The slash commands must be configured in your AI coding workspace; creating this
 - `npm test` — run all non-scaffold scenarios.
 - `npm run test:headed` — run the non-scaffold suite with a visible browser.
 
-The scaffold scenario is tagged `@scaffold` and excluded from application-suite commands. Smoke and regression tags are available as defaults; use the tags appropriate to the project.
+The scaffold scenario is tagged `@scaffold` and excluded from application-suite commands. For this activity, ST-001–ST-010 are tagged `@smoke` (Happy Path), and ST-011–ST-015 are tagged `@regression` (Negative Path). Here, `@regression` is the activity's label for its negative-path set; `npm test` runs both sets together.
 
 ## Reports and logs
 
@@ -42,7 +42,7 @@ The scaffold scenario is tagged `@scaffold` and excluded from application-suite 
 
 - `features/` — Gherkin feature files.
 - `step-definitions/` — thin Cucumber bindings that call page objects.
-- `main/locators/` — locator descriptors.
-- `main/functions/` — page-object actions and assertions.
+- `main/locators/` — verified locator descriptors.
+- `main/functions/` — page-object actions and assertions, including training-site behavior.
 - `main/utils/` — scenario World, hooks, PageManager, logging, and screenshots.
-- `prompt-log/` — optional; manually populated with prompts actually used.
+- `prompt-log/` — exact `/init-framework` and per-case `/generate-test` prompt records.

@@ -23,5 +23,5 @@ module.exports = {
   smoke: { ...common, tags: "@smoke and not @scaffold" },
   regression: { ...common, tags: "@regression and not @scaffold" },
   scaffold: { ...common, tags: "@scaffold" },
-  "dry-run": { ...common, dryRun: true, tags: "@scaffold" }
+  "dry-run": { ...common, dryRun: true }
 };
