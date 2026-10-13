@@ -6,6 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "test": "cucumber-js --profile default",
+    "test:chromium": "cross-env BROWSER=chromium cucumber-js --profile default",
+    "test:firefox": "cross-env BROWSER=firefox cucumber-js --profile default",
+    "test:webkit": "cross-env BROWSER=webkit cucumber-js --profile default",
     "test:smoke": "cucumber-js --profile smoke",
     "test:regression": "cucumber-js --profile regression",
     "test:scaffold": "cucumber-js --profile scaffold",

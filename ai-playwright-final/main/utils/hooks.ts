@@ -1,13 +1,20 @@
 /** Cucumber browser lifecycle, scenario logging, and failure screenshot hooks. */
 import { After, AfterAll, Before, BeforeAll, Status } from "@cucumber/cucumber";
-import { chromium, type Browser } from "@playwright/test";
+import { chromium, firefox, webkit, type Browser, type BrowserType } from "@playwright/test";
 import { logger } from "main/utils/logger";
 import { save_failure_screenshot } from "main/utils/screenshot";
 import type { TestWorld } from "main/utils/world";
 
 let browser: Browser | undefined;
 
-BeforeAll(async function () {
+const browserTypes = { chromium, firefox, webkit } as const;
+type BrowserName = keyof typeof browserTypes;
+
+function isBrowserName(value: string): value is BrowserName {
+  return Object.hasOwn(browserTypes, value);
+}
+
+BeforeAll({ timeout: 30_000 }, async function () {
   const rawBaseUrl = process.env.BASE_URL;
   if (!rawBaseUrl) {
     throw new Error("BASE_URL is required; copy .env.example to .env and configure it.");
@@ -22,7 +29,16 @@ BeforeAll(async function () {
     throw new Error(`BASE_URL must be a valid absolute http(s) URL: ${String(error)}`);
   }
 
-  browser = await chromium.launch({ headless: process.env.HEADED !== "true" });
+  const browserName = process.env.BROWSER ?? "chromium";
+  if (!isBrowserName(browserName)) {
+    throw new Error(
+      `Unsupported BROWSER "${browserName}". Choose one of: ${Object.keys(browserTypes).join(", ")}.`
+    );
+  }
+
+  const browserType: BrowserType = browserTypes[browserName];
+  browser = await browserType.launch({ headless: process.env.HEADED !== "true" });
+  logger.info("Browser launched", { browser: browserName });
 });
 
 Before(async function (this: TestWorld, { pickle }) {

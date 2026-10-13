@@ -215,9 +215,10 @@ Set `BASE_URL` to the selected application URL. If none is provided, leave it bl
 
 ```text
 BASE_URL=
+BROWSER=chromium
 ```
 
-Load environment variables before Cucumber hooks or page objects use them. Fail with a clear actionable error if `BASE_URL` is absent or invalid; do not silently navigate to an invented URL.
+Load environment variables before Cucumber hooks or page objects use them. Fail with a clear actionable error if `BASE_URL` is absent or invalid; do not silently navigate to an invented URL. Support `BROWSER=chromium|firefox|webkit`, default to Chromium when unset, and fail clearly for any unsupported value. Apply the selection to full-suite, tag-based, headed, and scaffold profiles.
 
 The custom Cucumber World owns the scenario's `BrowserContext`, `Page`, and `PageManager`. Hooks must:
 
@@ -227,7 +228,7 @@ The custom Cucumber World owns the scenario's `BrowserContext`, `Page`, and `Pag
 4. Log scenario end/status and close the context reliably.
 5. Close the browser in an `AfterAll` hook if the implementation shares a browser process.
 
-Use supported Playwright browser installation commands and document them in the README.
+Support Chromium, Firefox, and WebKit. Document `npx playwright install chromium firefox webkit` in the README, with the Linux option `npx playwright install --with-deps chromium firefox webkit` for installing required system dependencies.
 
 ### 6.5 Winston logger
 
@@ -263,6 +264,9 @@ These examples are the implementation baseline for the scaffold. Keep generated 
   "type": "commonjs",
   "scripts": {
     "test": "cucumber-js --profile default",
+    "test:chromium": "cross-env BROWSER=chromium cucumber-js --profile default",
+    "test:firefox": "cross-env BROWSER=firefox cucumber-js --profile default",
+    "test:webkit": "cross-env BROWSER=webkit cucumber-js --profile default",
     "test:smoke": "cucumber-js --profile smoke",
     "test:regression": "cucumber-js --profile regression",
     "test:scaffold": "cucumber-js --profile scaffold",
@@ -600,14 +604,20 @@ export async function save_failure_screenshot(
 ```ts
 /** Cucumber browser lifecycle, scenario logging, and failure screenshot hooks. */
 import { After, AfterAll, Before, BeforeAll, Status } from "@cucumber/cucumber";
-import { chromium, type Browser } from "@playwright/test";
+import { chromium, firefox, webkit, type Browser, type BrowserType } from "@playwright/test";
 import { logger } from "main/utils/logger";
 import { save_failure_screenshot } from "main/utils/screenshot";
 import type { TestWorld } from "main/utils/world";
 
 let browser: Browser | undefined;
+const browserTypes = { chromium, firefox, webkit } as const;
+type BrowserName = keyof typeof browserTypes;
 
-BeforeAll(async function () {
+function isBrowserName(value: string): value is BrowserName {
+  return Object.hasOwn(browserTypes, value);
+}
+
+BeforeAll({ timeout: 30_000 }, async function () {
   if (!process.env.BASE_URL) {
     throw new Error("BASE_URL is required; copy .env.example to .env and configure it.");
   }
@@ -617,7 +627,15 @@ BeforeAll(async function () {
   } catch (error) {
     throw new Error(`BASE_URL must be a valid absolute http(s) URL: ${String(error)}`);
   }
-  browser = await chromium.launch({ headless: process.env.HEADED !== "true" });
+  const browserName = process.env.BROWSER ?? "chromium";
+  if (!isBrowserName(browserName)) {
+    throw new Error(
+      `Unsupported BROWSER "${browserName}". Choose one of: ${Object.keys(browserTypes).join(", ")}.`
+    );
+  }
+  const browserType: BrowserType = browserTypes[browserName];
+  browser = await browserType.launch({ headless: process.env.HEADED !== "true" });
+  logger.info("Browser launched", { browser: browserName });
 });
 
 Before(async function (this: TestWorld, { pickle }) {
@@ -753,18 +771,23 @@ Keep the CI image synchronized with the Playwright package version. Supply `BASE
 
 ## Setup
 1. Install the supported Node.js version and run `npm ci`.
-2. Run `npx playwright install --with-deps chromium`.
-3. Copy `.env.example` to `.env` and set `BASE_URL`.
+2. Run `npx playwright install chromium firefox webkit`. On Linux, use `npx playwright install --with-deps chromium firefox webkit` to install system dependencies too.
+3. Copy `.env.example` to `.env`, set `BASE_URL`, and choose `BROWSER=chromium`, `BROWSER=firefox`, or `BROWSER=webkit` (default: Chromium).
 4. Install a Java runtime to generate/serve Allure reports with the bundled Allure 2 command-line tool.
 
 ## Run
 - `npm run test:scaffold` — verify framework wiring
+- `npm run test:chromium` — run the full non-scaffold suite in Chromium
+- `npm run test:firefox` — run the full non-scaffold suite in Firefox
+- `npm run test:webkit` — run the full non-scaffold suite in WebKit
 - `npm run test:smoke` — run `@smoke` scenarios
 - `npm run test:regression` — run `@regression` scenarios
 - `npm test` — run all non-scaffold scenarios
 - `npm run test:headed` — run with a visible browser
 - `npm run test:dry-run` — check feature/step bindings without browser execution
 - `npm run typecheck` — check TypeScript
+
+Chromium is the default browser. Set `BROWSER=firefox` or `BROWSER=webkit` in `.env` to run tag-based, scaffold, or headed commands in another engine. Install the matching Playwright browser binaries before running scenarios.
 
 ## Reports and logs
 - Cucumber HTML: `reports/cucumber-report.html`; serve with `npm run report:html:open`.
