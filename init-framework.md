@@ -43,18 +43,23 @@ Use supplied project documentation, requirements, URLs, and test-case IDs if pre
 
 ## 2 — TARGET CHECK  *(safety gate)*
 
+Resolve and print the target's absolute path, then inspect it before planning or writing any file. Treat any existing file or directory entry (including hidden files) as existing content; do not treat a folder as empty because it lacks `package.json`.
+
 | Condition | Action |
 |---|---|
-| Target does not exist or exists and is empty | Proceed |
-| Target already contains a framework (`package.json` plus Playwright/Cucumber configuration) | Stop and ask whether to augment or abort |
-| Target has unrelated content | Stop and ask whether to overwrite, nest the scaffold, or abort |
+| Target does not exist | Proceed; create the target only after the user approves the plan |
+| Target exists and is genuinely empty | Proceed after the user approves the plan |
+| Target contains this or another automation framework, including a `package.json` or Playwright/Cucumber configuration | Stop. Do not scaffold or modify anything. Ask whether the user wants to abort or explicitly augment the existing project |
+| Target contains any other files, folders, or hidden entries | Stop. Do not scaffold, overwrite, move, or delete anything. Ask whether the user wants to abort or choose a different target folder |
 
-Never overwrite, delete, or silently replace existing files. Before planning, print:
+If the user explicitly approves augmentation of an existing framework, first inspect its files and propose a specific list of additions/edits. Make only the approved changes; preserve existing files and behavior, and do not replace or regenerate the scaffold. Approval to augment is not approval to overwrite or delete files. If the user chooses abort or does not answer, make no changes.
+
+Never overwrite, delete, move, or silently replace existing files. Before planning, print:
 
 ```text
 Target:   <absolute path>
 BASE_URL: <selected URL>
-Status:   <empty | conflicts: <reason>>
+Status:   <does not exist | empty | conflicts: <reason>>
 ```
 
 ---
