@@ -1,11 +1,12 @@
 /** Cucumber browser lifecycle, scenario logging, and failure screenshot hooks. */
-import { After, AfterAll, Before, BeforeAll, Status } from "@cucumber/cucumber";
+import { After, AfterAll, Before, BeforeAll, setDefaultTimeout, Status } from "@cucumber/cucumber";
 import { chromium, firefox, webkit, type Browser, type BrowserType } from "@playwright/test";
 import { logger } from "main/utils/logger";
 import { save_failure_screenshot } from "main/utils/screenshot";
 import type { TestWorld } from "main/utils/world";
 
 let browser: Browser | undefined;
+setDefaultTimeout(30_000);
 
 const browserTypes = { chromium, firefox, webkit } as const;
 type BrowserName = keyof typeof browserTypes;

@@ -1,0 +1,15 @@
+/generate-test --project ./ai-playwright-final --ids ST-008
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-008
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Open and Confirm Modal
+Steps:
+1. Navigate to the training site.
+2. Navigate to Modal Dialog section.
+3. Click Open Confirmation Modal.
+4. Assert the modal overlay is visible.
+5. Click the Confirm button inside the modal.
+6. Assert the modal is no longer visible.
+Expected result: The modal opens on button click and closes after confirming.

@@ -19,9 +19,10 @@ const common = {
 };
 
 module.exports = {
-  default: { ...common, tags: "not @scaffold" },
-  smoke: { ...common, tags: "@smoke and not @scaffold" },
-  regression: { ...common, tags: "@regression and not @scaffold" },
+  default: { ...common, tags: "not @scaffold and not @demo-failure" },
+  smoke: { ...common, tags: "@smoke and not @scaffold and not @demo-failure" },
+  regression: { ...common, tags: "@regression and not @scaffold and not @demo-failure" },
   scaffold: { ...common, tags: "@scaffold" },
-  "dry-run": { ...common, dryRun: true, tags: "@scaffold" }
+  "demo-failure": { ...common, tags: "@demo-failure" },
+  "dry-run": { ...common, dryRun: true }
 };

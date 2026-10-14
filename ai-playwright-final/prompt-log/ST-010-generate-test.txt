@@ -1,0 +1,15 @@
+/generate-test --project ./ai-playwright-final --ids ST-010
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-010
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Drag Card from TO DO to IN PROGRESS
+Steps:
+1. Navigate to the training site.
+2. Navigate to Drag & Drop section.
+3. Locate the Write login test card in the TO DO column.
+4. Drag it to the IN PROGRESS column.
+5. Assert the card appears in IN PROGRESS.
+6. Assert the TO DO column no longer contains the card.
+Expected result: The card moves from TO DO to IN PROGRESS successfully.

@@ -1,0 +1,14 @@
+/generate-test --project ./ai-playwright-final --ids ST-011
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-011
+Test category: Negative Path
+Cucumber tag: @regression
+Title: Failed Login with Invalid Password
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Login Form section.
+3. Enter test@example.com in the Email field.
+4. Enter wrongpassword in the Password field.
+5. Click the Sign In button.
+Expected result: An error message is displayed indicating invalid credentials; the user is not logged in.

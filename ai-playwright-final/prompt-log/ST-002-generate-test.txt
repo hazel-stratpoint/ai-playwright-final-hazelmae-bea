@@ -1,0 +1,19 @@
+/generate-test --project ./ai-playwright-final --ids ST-002
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-002
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Complete Successful Registration
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Registration Form section.
+3. Fill in First Name: Jane and Last Name: Doe.
+4. Enter email: jane@company.com.
+5. Select any country and role from the dropdowns.
+6. Check at least one interest checkbox.
+7. Select an experience level radio button.
+8. Enter any text in the Bio field.
+9. Check the I agree to the Terms of Service checkbox.
+10. Click Create Account.
+Expected result: A success confirmation message is displayed.

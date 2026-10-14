@@ -1,0 +1,14 @@
+/generate-test --project ./ai-playwright-final --ids ST-005
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-005
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Switch Between All Tabs
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Tabs section.
+3. Click the Features tab and assert its content panel is visible.
+4. Click the Pricing tab and assert its content panel is visible.
+5. Click the Overview tab and assert its content panel is visible.
+Expected result: Each tab displays its own content panel; other panels are hidden.

@@ -1,0 +1,13 @@
+/generate-test --project ./ai-playwright-final --ids ST-015
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-015
+Test category: Negative Path
+Cucumber tag: @regression
+Title: Type Text Inside Iframe
+Steps:
+1. Navigate to the training site.
+2. Navigate to the Iframe section.
+3. Click the Type here... input inside the iframe.
+4. Type: Hello from Playwright.
+Expected result: The text Hello from Playwright is entered and visible inside the iframe's input field.

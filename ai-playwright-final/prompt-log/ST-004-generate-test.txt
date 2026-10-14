@@ -1,0 +1,15 @@
+/generate-test --project ./ai-playwright-final --ids ST-004
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-004
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Toggle Hidden Button Visibility
+Steps:
+1. Navigate to the training site.
+2. Navigate to Buttons & Interactions section.
+3. Click the Toggle Hidden Button.
+4. Assert the hidden button is now visible.
+5. Click Toggle Hidden Button again.
+6. Assert the hidden button is no longer visible.
+Expected result: The hidden button toggles between visible and hidden on each click.

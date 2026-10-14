@@ -1,0 +1,14 @@
+/generate-test --project ./ai-playwright-final --ids ST-009
+
+Page URL: https://cdn.stratpoint.io/training-2026/playwright-training-site.html
+Test case ID: ST-009
+Test category: Happy Path
+Cucumber tag: @smoke
+Title: Lazy Load Content Appears After Delay
+Steps:
+1. Navigate to the training site.
+2. Navigate to Delayed & Dynamic Content.
+3. Click the Load Content button.
+4. Wait for the content to appear (up to 3 seconds).
+5. Assert the loaded content is visible on the page.
+Expected result: Content appears within approximately 2 seconds and is visible.

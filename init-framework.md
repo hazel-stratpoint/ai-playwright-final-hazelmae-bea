@@ -207,6 +207,7 @@ Use the Cucumber CLI for every test script. `npm test` must not call `playwright
 - Set the async/await snippet style and configure useful console output plus HTML, JSON (if used by reporting), and Allure outputs.
 - Define profiles or equivalent npm commands for the full non-scaffold suite, project-selected tags, `@scaffold`, headed execution, and dry-run.
 - Ensure `@scaffold` is excluded from application-suite commands unless explicitly requested.
+- If an intentional failure/screenshot demonstration is requested, tag it `@demo-failure`, provide an explicit opt-in command/profile, and exclude it from every normal application-suite command. Never generate intentional failures by default.
 - Ensure reports are written under `reports/` and Allure results under `allure-results/`.
 
 ### 6.4 `.env.example` and browser lifecycle
@@ -343,11 +344,11 @@ const common = {
 };
 
 module.exports = {
-  default: { ...common, tags: "not @scaffold" },
-  smoke: { ...common, tags: "@smoke and not @scaffold" },
-  regression: { ...common, tags: "@regression and not @scaffold" },
+  default: { ...common, tags: "not @scaffold and not @demo-failure" },
+  smoke: { ...common, tags: "@smoke and not @scaffold and not @demo-failure" },
+  regression: { ...common, tags: "@regression and not @scaffold and not @demo-failure" },
   scaffold: { ...common, tags: "@scaffold" },
-  "dry-run": { ...common, dryRun: true, tags: "@scaffold" }
+  "dry-run": { ...common, dryRun: true }
 };
 ```
 
@@ -603,13 +604,14 @@ export async function save_failure_screenshot(
 
 ```ts
 /** Cucumber browser lifecycle, scenario logging, and failure screenshot hooks. */
-import { After, AfterAll, Before, BeforeAll, Status } from "@cucumber/cucumber";
+import { After, AfterAll, Before, BeforeAll, setDefaultTimeout, Status } from "@cucumber/cucumber";
 import { chromium, firefox, webkit, type Browser, type BrowserType } from "@playwright/test";
 import { logger } from "main/utils/logger";
 import { save_failure_screenshot } from "main/utils/screenshot";
 import type { TestWorld } from "main/utils/world";
 
 let browser: Browser | undefined;
+setDefaultTimeout(30_000);
 const browserTypes = { chromium, firefox, webkit } as const;
 type BrowserName = keyof typeof browserTypes;
 
