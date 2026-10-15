@@ -8,12 +8,12 @@ Open this only **after** attempting the matching exercise in `code-study-workboo
 
 | Feature sentence | Step expression (`training-site.steps.ts`) | POM method (`trainingSiteMethods.ts`) | Locator keys (`trainingSiteLocators.ts`) |
 | --- | --- | --- | --- |
-| `Given I am on the "Sortable Data Table" section` | `I am on the {string} section` | `navigate_to_section` | `sections["Sortable Data Table"]` → `#section-table` |
-| `Then the table initially shows 8 users` | `the table initially shows 8 users` | `verify_initial_table` | `table.rows` → `#table-body tr`, `table.count` → `#table-count` |
-| `When I filter the table by "Alice"` | `I filter the table by {string}` | `filter_table` | `table.search` → `#table-search` |
-| `Then only 1 row containing "Alice Chen" is shown` | `only 1 row containing {string} is shown` | `verify_single_table_row` | `table.rows` → `#table-body tr` |
+| `Given I am on the "Sortable Data Table" section` | `I am on the {string} section` | `navigate_to_section` | `sections["Sortable Data Table"]` → `getByRole("heading", { name: "Sortable Data Table" })` |
+| `Then the table initially shows 8 users` | `the table initially shows 8 users` | `verify_initial_table` | `table.rows` → `getByTestId("table-body").getByRole("row")`, `table.count` → `getByTestId("table-count")` |
+| `When I filter the table by "Alice"` | `I filter the table by {string}` | `filter_table` | `table.search` → `getByRole("searchbox", { name: "Filter rows..." })` |
+| `Then only 1 row containing "Alice Chen" is shown` | `only 1 row containing {string} is shown` | `verify_single_table_row` | `table.rows` → `getByTestId("table-body").getByRole("row")` |
 
-`navigate_to_section` resolves the section name to a selector, navigates to `BASE_URL`, and scrolls the section into view.
+`navigate_to_section` resolves the section name to its heading locator, navigates to `BASE_URL`, and scrolls that heading into view.
 
 ---
 
@@ -65,20 +65,20 @@ The *outcome assertion* is also selected per scenario (`verify_registration_succ
 
 | Locator | Strategy | Scope |
 | --- | --- | --- |
-| `#login-email` | stable ID | global |
-| `[data-testid="interest-web"]` | test ID | global |
-| `input[name="experience"][value="beginner"]` | attribute selector | global (value-specific) |
-| `#table-body tr` | structural CSS | scoped to `#table-body` |
-| `#alerts-container .alert` | class CSS | scoped to `#alerts-container` |
+| `getByPlaceholder("test@example.com")` | accessible placeholder | global |
+| `getByRole("checkbox", { name: "Web Testing" })` | accessible role/name | global |
+| `getByRole("radio", { name: "Beginner" })` | accessible role/name | global |
+| `getByTestId("table-body").getByRole("row")` | test ID + accessible role | scoped to the table body |
+| `getByTestId("alerts-container").locator(".alert")` | scoped class CSS | scoped to the alerts container |
 
-The last two are *scoped* because their leading `#container` restricts the match to one area and prevents matching a similarly named element elsewhere.
+The last two are *scoped* because `getByTestId("table-body")` and `getByTestId("alerts-container")` restrict the query to one area.
 
 ---
 
 ## A6 — Robustness judgment
 
-- `[data-testid="interest-web"]` is the more robust contract. It is purpose-built for automation and decoupled from styling, markup structure, and copy.
-- `input[name="experience"][value="beginner"]` is fragile: renaming the `name`, changing the input `type`, or editing the `value` label (even translating it) breaks the selector.
+- The named checkbox and radio locators use user-facing accessible names, so they remain clear and avoid relying on implementation-specific attributes.
+- The table and alert locators scope their queries to a stable container, avoiding unrelated rows or alerts elsewhere on the page.
 - You must verify against the live page because the site's real markup is the source of truth. "Improving" a working selector from an assumption risks breaking a passing test for no measurable gain.
 
 ---
@@ -88,13 +88,13 @@ The last two are *scoped* because their leading `#container` restricts the match
 ```ts
 async toggle_hidden_button(): Promise<void> {
   await this.run_action("toggle_hidden_button", async () => {
-    await this.page.locator(trainingSiteLocators.hiddenButton.toggle).click();
+    await this.locators.hiddenButton.toggle.click();
   });
 }
 
 async verify_hidden_button_visibility(visible: boolean): Promise<void> {
   await this.run_action("verify_hidden_button_visibility", async () => {
-    const target = this.page.locator(trainingSiteLocators.hiddenButton.target);
+    const target = this.locators.hiddenButton.target;
     if (visible) {
       await expect(target).toBeVisible();
     } else {

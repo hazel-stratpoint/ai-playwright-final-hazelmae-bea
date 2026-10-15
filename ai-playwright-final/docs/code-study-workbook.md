@@ -218,44 +218,43 @@ A locator module is the single named home for selectors. Page objects import nam
 `main/locators/trainingSiteLocators.ts`:
 
 ```ts
-export const trainingSiteLocators = {
+import type { Page } from "@playwright/test";
+
+export const createTrainingSiteLocators = (page: Page) => ({
   sections: {
-    "Login Form": "#section-login",           // section anchors, used to scroll to an area
+    "Login Form": page.getByRole("heading", { name: "Login Form", exact: true }),
     // ...
   },
   login: {
-    email: "#login-email",
-    password: "#login-password",
-    submit: "#login-submit",
-    message: "#login-message"
+    email: page.getByPlaceholder("test@example.com", { exact: true }),
+    password: page.getByLabel("Password", { exact: true }),
+    submit: page.getByRole("button", { name: "Sign In", exact: true }),
+    message: page.getByTestId("login-message")
   },
   registration: {
-    webInterest: '[data-testid="interest-web"]',
-    beginnerExperience: 'input[name="experience"][value="beginner"]',
+    webInterest: page.getByRole("checkbox", { name: "Web Testing", exact: true }),
+    beginnerExperience: page.getByRole("radio", { name: "Beginner", exact: true }),
     // ...
   },
   // ...counter, hiddenButton, tabs, table, alerts, modal, delayedContent, dragAndDrop, iframe
-} as const;
-
-export type TrainingSection = keyof typeof trainingSiteLocators.sections;
-export type TrainingTab = keyof typeof trainingSiteLocators.tabs;
+});
 ```
 
 Three things to learn from this file:
 
 1. **Grouping by feature area** (`login`, `table`, `modal`) keeps ownership clear. A locator belongs to the page object that understands its meaning.
-2. **`as const` + derived types.** `as const` makes the values literal, and `keyof typeof` derives `TrainingSection` / `TrainingTab`, which lets POM methods validate named inputs (`trainingSiteMethods.ts:12`, `:160`).
-3. **Strategy varies by element.** `#login-email` is an ID; `[data-testid="interest-web"]` is a test ID; `input[name="experience"][value="beginner"]` is an attribute selector; `#table-body tr` is a scoped structural selector.
+2. **Page-bound locators.** The factory accepts Playwright's `Page` and returns live `Locator` objects, so POM methods can act on them directly without wrapping selector strings in `page.locator(...)`.
+3. **Accessible strategies first.** Roles, labels, and placeholders identify controls by how users interact with them; test IDs provide a stable contract for app-specific targets. The alert banner class is the one remaining CSS selector because the banners have no accessible role or individual test IDs.
 
 ### Locator preference ladder (best → worst)
 
-1. Accessible **role + name** — `getByRole("button", { name: "Sign In" })`.
+1. Accessible **role + name** — `page.getByRole("button", { name: "Sign In" })`.
 2. **Label / placeholder** for correctly associated form fields.
 3. **Test ID** — a deliberate automation contract.
-4. **Stable ID or simple CSS** that reflects a real, verified selector.
+4. **Stable ID or simple CSS** only when no suitable accessible locator or test ID exists.
 5. **XPath** — last resort; document why.
 
-Prefer the highest rung the page actually supports. The training site exposes stable IDs and `data-testid`s, so this project uses those.
+Prefer the highest rung the page actually supports. The training site exposes accessible names and stable test IDs, so this project uses those, with CSS only for the alert banner class.
 
 ### Exercise A5 (Track A — analysis)
 
@@ -263,19 +262,19 @@ For each locator below, name its strategy and say whether it is *global* or *sco
 
 | Locator | Strategy? | Global or scoped? |
 | --- | --- | --- |
-| `login.email` = `#login-email` | ? | ? |
-| `registration.webInterest` = `[data-testid="interest-web"]` | ? | ? |
-| `beginnerExperience` = `input[name="experience"][value="beginner"]` | ? | ? |
-| `table.rows` = `#table-body tr` | ? | ? |
-| `alerts.banners` = `#alerts-container .alert` | ? | ? |
+| `login.email` = `getByPlaceholder("test@example.com")` | ? | ? |
+| `registration.webInterest` = `getByRole("checkbox", { name: "Web Testing" })` | ? | ? |
+| `beginnerExperience` = `getByRole("radio", { name: "Beginner" })` | ? | ? |
+| `table.rows` = `getByTestId("table-body").getByRole("row")` | ? | ? |
+| `alerts.banners` = `getByTestId("alerts-container").locator(".alert")` | ? | ? |
 
 ### Exercise A6 (Track A — judgment)
 
-`registration.webInterest` uses `data-testid`, while `beginnerExperience` uses `input[name=...][value=...]`. Which is the more robust automation contract, and what could make the other one fragile? Then: why must you *verify against the real page* before "improving" either one?
+Which locators above identify controls by their accessible role and name? Why does `alerts.banners` still use CSS, and what would need to change in the page to replace it with a role- or test-ID-based locator? Always verify locator behavior against the real page rather than guessing.
 
 ### Self-check
 
-There is no runnable self-check for pure analysis. For coding exercises in this layer, `npm run typecheck` confirms the module compiles and derived types resolve.
+There is no runnable self-check for pure analysis. For coding exercises in this layer, `npm run typecheck` confirms the module compiles and locator types resolve.
 
 ---
 
@@ -291,7 +290,11 @@ There is no runnable self-check for pure analysis. For coding exercises in this 
 
 ```ts
 export class trainingSiteMethods {
-  constructor(private readonly page: Page) {}
+  private readonly locators: ReturnType<typeof createTrainingSiteLocators>;
+
+  constructor(private readonly page: Page) {
+    this.locators = createTrainingSiteLocators(page);
+  }
 
   /** Increment the counter the requested number of times. */
   async increment_counter(times: number): Promise<void> {
@@ -299,7 +302,7 @@ export class trainingSiteMethods {
       if (!Number.isInteger(times) || times < 1) {           // guard inputs
         throw new Error(`Counter increment count must be a positive integer; received "${times}".`);
       }
-      const incrementButton = this.page.locator(trainingSiteLocators.counter.increment);
+      const incrementButton = this.locators.counter.increment;
       for (let click = 0; click < times; click += 1) {
         await incrementButton.click();                        // auto-waiting action
       }
@@ -309,7 +312,7 @@ export class trainingSiteMethods {
   /** Verify the counter's displayed value. */
   async verify_counter_value(value: string): Promise<void> {
     await this.run_action("verify_counter_value", async () => {
-      await expect(this.page.locator(trainingSiteLocators.counter.value)).toHaveText(value); // web-first assertion
+      await expect(this.locators.counter.value).toHaveText(value); // web-first assertion
     });
   }
 
@@ -340,7 +343,7 @@ export class trainingSiteMethods {
 
 In a scratch file, reimplement `toggle_hidden_button()` and `verify_hidden_button_visibility(visible: boolean)` from scratch:
 
-- toggle clicks `trainingSiteLocators.hiddenButton.toggle`;
+- toggle clicks `this.locators.hiddenButton.toggle`;
 - verify asserts `toBeVisible()` when `visible` is true, else `toBeHidden()`;
 - both wrapped in `run_action`.
 

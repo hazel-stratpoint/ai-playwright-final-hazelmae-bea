@@ -69,7 +69,7 @@ For example, ST-003 says to increment the counter five times:
 2. [`training-site.steps.ts`](../step-definitions/training-site.steps.ts) binds `I increment the counter {int} times` and delegates to the POM.
 3. [`page.manager.ts`](../main/utils/page.manager.ts) lazily provides the training-site page object to the current scenario.
 4. [`trainingSiteMethods.ts`](../main/functions/trainingSiteMethods.ts) clicks the increment locator five times and later asserts the displayed value.
-5. [`trainingSiteLocators.ts`](../main/locators/trainingSiteLocators.ts) owns the selector `#counter-inc`.
+5. [`trainingSiteLocators.ts`](../main/locators/trainingSiteLocators.ts) creates the counter button locator with `getByRole("button", { name: "+" })`.
 6. [`world.ts`](../main/utils/world.ts) supplies the isolated Playwright `Page`.
 7. [`hooks.ts`](../main/utils/hooks.ts) logs the scenario and tears down its context.
 8. `cucumber.js`'s configured formatters produce the HTML and Allure result data.
@@ -202,7 +202,7 @@ The dry-run checks that files load and Gherkin steps resolve. It does not prove 
 
 ## 7. Locators: what they are and how to judge them
 
-A locator is a Playwright query that identifies one or more live elements. The locator module gives selectors a named home. In this project, `trainingSiteLocators` groups selectors by feature area (`login`, `registration`, `counter`, `table`, etc.); POM methods use these names rather than repeating selector strings.
+A locator is a Playwright query that identifies one or more live elements. In this project, `createTrainingSiteLocators(page)` groups page-bound Playwright locators by feature area (`login`, `registration`, `counter`, `table`, etc.); POM methods use these names rather than repeating selector strings.
 
 Locator choice, from generally preferred to less preferred:
 
@@ -212,7 +212,7 @@ Locator choice, from generally preferred to less preferred:
 4. **Stable ID or CSS** when it reflects a real, verified app selector and is not overly structural.
 5. **XPath** only when the DOM offers no better option; document why it is necessary.
 
-This training site has stable IDs/test IDs, which is why the locators use them. For a production application, coordinate test IDs with developers and avoid selectors tied to styling classes or fragile DOM positions. Scope repeated names to their page/section or container. Assert a locator is unique when ambiguity could hide a defect.
+The training-site locators use accessible roles, labels, and placeholders wherever possible, plus test IDs for stable app-specific targets. CSS is retained only where the page does not expose a suitable accessible locator, such as alert banners identified by a class. For a production application, coordinate test IDs with developers and avoid selectors tied to styling classes or fragile DOM positions. Scope repeated names to their page/section or container. Assert a locator is unique when ambiguity could hide a defect.
 
 Keep locators in one module per page/feature area, but do not create a generic “selector registry” so broad that ownership becomes unclear. A locator belongs to the POM that understands its meaning.
 
@@ -396,7 +396,7 @@ To learn the framework rather than memorize it:
 1. Read one `.feature` scenario aloud and identify each Given/When/Then.
 2. Find the exact step expressions in `training-site.steps.ts`.
 3. Follow the called method into `trainingSiteMethods.ts`.
-4. Find each selector in `trainingSiteLocators.ts`; inspect the training page to confirm it.
+4. Find each named locator in `trainingSiteLocators.ts`; inspect the training page to confirm it.
 5. Trace `this.pages` back through PageManager and the custom World.
 6. Read the `BeforeAll`, `Before`, `After`, and `AfterAll` hooks in order.
 7. Run one tagged scenario, then inspect the log and report.
